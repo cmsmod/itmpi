@@ -1,0 +1,450 @@
+000010   03  OSDM-LEADER.                                               00001000
+000020       05  QA5L-HOST-CODE              PIC X(01).                 00002000
+000030       05  QA5L-BATCH-NO               PIC X(04).                 00003000
+000040       05  QA5L-CONT-CODE              PIC X(08).                 00004000
+000050       05  QA5L-CLAIM-RIC              PIC 9(01).                 00005000
+000060       05  QA5L-RECORD-STAMP.                                     00006000
+000070           07  QA5L-CWFMQA-DATE        PIC 9(08).                 00007000
+000080           07  QA5L-SEQUENCE-NUMBER    PIC S9(9) COMP-3.          00008000
+000090           07  QA5L-TOT-SEG-COUNT      PIC 99.                    00009000
+000091           07  QA5L-SEG-NUMBER         PIC 99.                    00009100
+000092       05  QA5L-DATE-RCVD              PIC 9(08).                 00009200
+000093       05  QA5L-ERROR.                                            00009300
+000094           07  QA5L-DISP-CODE          PIC X(02).                 00009400
+000095           07  QA5L-ERROR-CODE         PIC X(04).                 00009500
+000096           07  QA5L-ERROR-ADDL         PIC X(01).                 00009600
+000097       05  QA5L-SAMPLE-FLAG            PIC X(01).                 00009700
+000098       05  QA5L-CONTROL-CODE           PIC X(01).                 00009800
+000099       05  QA5L-ERROR-FLAG             PIC X(01).                 00009900
+000100****************************************************************  00010010
+000200*****       HOME HEALTH   CR15                 *****************  00020014
+000300*****       LRECL = 31,463  FOR  MQR AND MQA   *****************  00030013
+000400*****       BASE CLAIM            =   1,254    *****************  00040010
+000500*****       ERROR CODE AREA       =      52    *****************  00050010
+000600*****       INPAT/SNF SPECIFIC    =     568    *****************  00060010
+000700*****       ONLINE TRAILER AREA   =     820    *****************  00070010
+000800*****   CLAIM FIXED         TOT   =   2,694    *****************  00080010
+000900*****   NCH-PTCH TRLR OUT                      *****************  00090010
+001000*****       ALL OTHER TRAILERS    =  28,769    *****************  00100010
+001100*****      (RVNU TRLR + 380 FILL  =     606)   *****************  00110010
+001200****************************************************************  00120010
+001300   03 QAR5-COMMON.                                                00130010
+001400     05 QAR5-RECL                 PIC S9(5)    COMP-3.            00140010
+001500     05 QAR5-NCH-NEAR-REC-VRSN-CD PIC X.                          00150010
+001600     05 QAR5-NCH-NEAR-LINE-RIC-CD PIC X.                          00160010
+001700     05 QAR5-CLAIM-RIC            PIC X(01).                      00170010
+001800         88 QAR5-INPATIENT-88         VALUE '1'.                  00180010
+001900         88 QAR5-SKILLED-NURSING-88   VALUE '2'.                  00190010
+002000         88 QAR5-HOSPICE-88           VALUE '3'.                  00200010
+002100         88 QAR5-OUTPATIENT-88        VALUE '4'.                  00210010
+002200         88 QAR5-HOME-HEALTH-88       VALUE '5'.                  00220010
+002300         88 QAR5-PHY-SUPPLIER-88      VALUE '6'.                  00230010
+002400         88 QAR5-DURABLE-EQUIP-88     VALUE '7'.                  00240010
+002500     05 QAR5-CLM-TYPE-CD          PIC X(02).                      00250010
+002600     05 QAR5-CLAIM-LINK-GROUP.                                    00260010
+002700         10 QAR5-CLAIM.                                           00270010
+002800             15 QAR5-CAN              PIC X(9).                   00280010
+002900             15 QAR5-CAN-NCH-EQUATEABLE PIC X(2).                 00290010
+003000             15 QAR5-BIC              PIC X(2).                   00300010
+003100         10 QAR5-NCH-STATE-SEGMENT    PIC X(01).                  00310010
+003200         10 QAR5-STATE-CODE           PIC X(02).                  00320010
+003300         10 QAR5-STAY-FROM            PIC 9(8).                   00330010
+003400         10 QAR5-STAY-THRU            PIC 9(8).                   00340010
+003500         10 QAR5-NCH-WEEKLY-PROC-DT   PIC 9(8).                   00350010
+003600         10 QAR5-ACCRETE-DATE         PIC 9(8).                   00360010
+003700         10 QAR5-ACCRETE-CTR          PIC S9(3) COMP-3.           00370010
+003800         10 QAR5-ICN                  PIC X(23).                  00380010
+003900         10 QAR5-ICN-ORIG             PIC X(23).                  00390010
+004000         10 QAR5-QUERY-CODE           PIC X.                      00400010
+004100         10 QAR5-PROVIDER             PIC X(06).                  00410010
+004200         10 QAR5-MQA-DATE             PIC 9(8).                   00420010
+004300         10 QAR5-SEQUENCE-NUMBER      PIC S9(9)     COMP-3.       00430010
+004400         10 QAR5-TOT-SEG-COUNT        PIC 99.                     00440010
+004500         10 QAR5-SEG-NUMBER           PIC 99.                     00450010
+004600         10 QAR5-TOT-LINE-COUNT       PIC 999.                    00460010
+004700         10 QAR5-SEG-LINE-COUNT       PIC 99.                     00470010
+004800     05 QAR5-PANDE-RIC            PIC X(01).                      00480010
+004900     05 QAR5-TRANS-CODE           PIC X(01).                      00490010
+005000     05 QAR5-BILL-TYPE            PIC X(03).                      00500010
+005100     05 FILLER-1                  PIC X(01).                      00510010
+005200     05 QAR5-QUERY-IND            PIC X(01).                      00520010
+005300     05 QAR5-DISP-CODE            PIC X(02).                      00530010
+005400     05 QAR5-ERROR-DISP           PIC X(02).                      00540010
+005500     05 QAR5-HA-HB-BIC-CODE       PIC X(01).                      00550010
+005600     05 QAR5-COUNTY-CODE          PIC X(03).                      00560010
+005700     05 QAR5-INTER-RECEIVED       PIC 9(8).                       00570010
+005800     05 QAR5-DATE-FORWARDED       PIC 9(8).                       00580010
+005900     05 QAR5-HCFA-RECEIVED        PIC 9(8).                       00590010
+006000     05 QAR5-INTER-NO             PIC X(05).                      00600010
+006100**** 05 QAR5-ONLINE-BATCH         PIC S9(15) COMP-3.              00610010
+006200     05 QAR5-ONLN-BATCH-SEQ       PIC X(04).                      00620010
+006300     05 QAR5-ONLN-BATCH-DATE      PIC S9(7) COMP-3.               00630010
+006400     05 QAR5-BATCH-NO             PIC X(04).                      00640010
+006500     05 QAR5-HIMA-ZIP             PIC X(09).                      00650010
+006600     05 QAR5-HIMA-SEX             PIC X(01).                      00660010
+006700     05 QAR5-HIMA-RACE            PIC X(01).                      00670010
+006800     05 QAR5-HIMA-DOB             PIC 9(8).                       00680010
+006900     05 QAR5-MEDICARE-STATUS      PIC X(02).                      00690010
+007000     05 QAR5-PAT-NAME.                                            00700010
+007100         07 QAR5-PAT-SURNAME      PIC X(06).                      00710010
+007200         07 QAR5-PAT-FIRST        PIC X(01).                      00720010
+007300         07 QAR5-PAT-MIDDLE       PIC X(01).                      00730010
+007400     05 QAR5-HOST-SITE            PIC X(01).                      00740010
+007500**** 05 QAR5-PRINCIPAL-DIAGNOSIS PIC X(05).                       00750010
+007600     05 QAR5-PRNCPAL-DGNS-GRP.                                    00760010
+007700         10  QAR5-PRNCPAL-DGNS-VRSN-CD       PIC X.               00770010
+007800         10  QAR5-PRNCPAL-DGNS-CD            PIC X(7).            00780010
+007900     05 FILLER-A1                 PIC X.                          00790010
+008000***  05 QAR5-ALIEN-OVERRIDE       PIC X(01).                      00800010
+008100     05 QAR5-NOPAY-CODE           PIC XX.                         00810010
+008200***  05 QAR5-NOPAY-CODE           PIC X(01).                      00820010
+008300     05 QAR5-RELIG-NONMED-CODE    PIC X(01).                      00830010
+008400     05 QAR5-REIMB-AMT            PIC S9(9)V99 COMP-3.            00840010
+008500     05 QAR5-PRIMARY-PAY-AMT      PIC S9(9)V99 COMP-3.            00850010
+008600     05 QAR5-PRIMARY-PAY-CODE     PIC X(01).                      00860010
+008700     05 QAR5-CO-CODE              PIC X(01).                      00870010
+008800     05 QAR5-ACTION-CODE          PIC X(01).                      00880010
+008900     05 QAR5-INTER-APPROVED       PIC 9(8).                       00890010
+009000     05 QAR5-PROVIDER-STATE-CODE PIC X(02).                       00900010
+009100     05 QAR5-NPI-TOTAL           PIC X(10).                       00910010
+009200     05 QAR5-PHYSICIANS.                                          00920010
+009300      06 QAR5-PHYSICIAN   OCCURS 03.                              00930010
+009400         07 QAR5-PHY-UPIN         PIC X(06).                      00940010
+009500         07 QAR5-PHY-NPI-TOTAL    PIC X(10).                      00950010
+009600         07 QAR5-PHY-NAME.                                        00960010
+009700             09 QAR5-PHY-SURNAME PIC X(06).                       00970010
+009800             09 QAR5-PHY-FIRST    PIC X(01).                      00980010
+009900             09 QAR5-PHY-MIDDLE   PIC X(01).                      00990010
+010000     05 QAR5-MEDICAID-PROVIDER    PIC X(13).                      01000010
+010100     05 QAR5-MEDICAID-INFORMATION PIC X(04).                      01010010
+010200     05 QAR5-HMO-PAID-IND         PIC X(01).                      01020010
+010300     05 QAR5-TREATMENT-AUTH       PIC X(18).                      01030010
+010400     05 QAR5-PATIENT-CONTROL      PIC X(20).                      01040010
+010500     05 QAR5-MEDICAL-RECORD       PIC X(17).                      01050010
+010600     05 QAR5-PRO-CONTROL-NUMBER   PIC X(12).                      01060010
+010700     05 QAR5-PRO-PROCESS-DATE     PIC 9(8).                       01070010
+010800     05 QAR5-DISCH-DEST           PIC X(02).                      01080010
+010900     05 QAR5-1ST-DGNS-E-CD-GRP.                                   01090010
+011000         10  QAR5-1ST-DGNS-E-VRSN-CD         PIC X.               01100010
+011100         10  QAR5-1ST-DGNS-E-CD              PIC X(7).            01110010
+011200**** 05 QAR5-EXTERNAL-CAUSE       PIC X(05).                      01120010
+011300**** 05 FILLER-1                  PIC X(01).                      01130010
+011400     05 QAR5-PPS-IND              PIC X(01).                      01140010
+011500     05 QAR5-TOTAL-CHARGES        PIC S9(9)V99  COMP-3.           01150010
+011600     05 QAR5-PRICER-RET-CODE      PIC XX.                         01160010
+011700     05 QAR5-BSI                  PIC X(4).                       01170010
+011800     05 QAR5-RAC-ADJ-IND          PIC X.                          01180010
+011900        88   QAR5-RAC-ADJ-IND-PRESENT  VALUE 'R'.                 01190010
+012000        88   QAR5-RAC-ADJ-IND-VALID    VALUE 'R' SPACE.           01200010
+012100     05 QAR5-CLM-WC-IND-CD        PIC X.                          01210010
+012200        88   QAR5-CLM-WC-IND-CD-PRESENT  VALUE 'Y'.               01220010
+012300        88   QAR5-CLM-WC-IND-CD-VALID    VALUE 'Y' SPACE.         01230010
+012400     05 QAR5-SRVC-FAC-ZIP-CD      PIC X(9).                       01240010
+012500     05 QAR5-CLM-PWK-CD           PIC X(2).                       01250010
+012600*****05 FILLER-2                  PIC X(47).                      01260010
+012700     05 QAR5-CARE-IMPRVMT-M1      PIC X(2).                       01270010
+012800     05 QAR5-CARE-IMPRVMT-M2      PIC X(2).                       01280010
+012900     05 QAR5-CARE-IMPRVMT-M3      PIC X(2).                       01290010
+013000     05 QAR5-CARE-IMPRVMT-M4      PIC X(2).                       01300010
+013100     05 QAR5-RNDRNG-ID-GRP.                                       01310010
+013200      10 QAR5-RNDRNG-UPIN         PIC X(6).                       01320010
+013300      10 QAR5-RNDRNG-NPI          PIC X(10).                      01330010
+013400      10 QAR5-RNDRNG-SRNM         PIC X(6).                       01340010
+013500      10 QAR5-RNDRNG-GVN-NAME     PIC X.                          01350010
+013600      10 QAR5-RNDRNG-MDL-NAME     PIC X.                          01360010
+013700      10 QAR5-RNDRNG-SPCLTY-CD    PIC X(2).                       01370010
+013800     05 QAR5-PTNT-RLTNSHP         PIC X(2).                       01380010
+013900     05 QAR5-FPS-MODEL-NUM        PIC X(2).                       01390010
+014000     05 QAR5-FPS-RSN-CD           PIC X(3).                       01400010
+014100     05 QAR5-FPS-RMRK-CD          PIC X(5).                       01410010
+014200     05 QAR5-FPS-MSN-1-CD         PIC X(5).                       01420010
+014300     05 QAR5-FPS-MSN-2-CD         PIC X(5).                       01430010
+014400     05 QAR5-MASS-ADJSTMT-IND-CD  PIC X.                          01440012
+014500     05 QAR5-NG-ACO-IND-1         PIC X.                          01450014
+014600     05 QAR5-NG-ACO-IND-2         PIC X.                          01460014
+014700     05 QAR5-NG-ACO-IND-3         PIC X.                          01470014
+014800     05 QAR5-NG-ACO-IND-4         PIC X.                          01480014
+014900     05 QAR5-NG-ACO-IND-5         PIC X.                          01490014
+015000     05 QAR5-RSDL-PMT-IND         PIC X.                          01500014
+015000     05 QAR5-ACO-ID-NUM           PIC X(10).                      01500014
+015000     05 QAR5-MBI-ID               PIC X(11).                      01500014
+015000     05 QAR5-BENE-ID-TYPE-CD      PIC X.                          01500014
+015000     05 QAR5-PRVDR-VLDTN-CD       PIC X(2).                       01500014
+015000     05 QAR5-RRB-EXCLSN-IND-SW    PIC X.                          01500014
+015000     05 FILLER-2                  PIC X(668).                     01500014
+015000***  05 FILLER-2                  PIC X(671).                     01500014
+015100***  05 FILLER-2                  PIC X(693).                     01510014
+015200***  05 FILLER-2                  PIC X(699).                     01520014
+014700*****    ML-IND  SET IN MQA0001 - VALUE 'M'. *****************    01470010
+014800*****       FOR WRITEOFF TO WEEKLY UH1044 ESRD FILE. *********    01480010
+015500     05 QAR5-ML-IND                 PIC X.                        01550014
+015600** END OF MQR, NCH COMMON FILLER                                  01560014
+015000     05 QAR5-HCFA-EDIT-CD-CNT     PIC 9(02).                      01500010
+015100     05 QAR5-HCFA-PATCH-CD-CNT    PIC 9(02).                      01510010
+015200     05 QAR5-MCO-PRD-TRLR-CNT     PIC 9(01).                      01520010
+015300     05 QAR5-CLM-DEMO-ID-TRLR-CNT PIC 9(01).                      01530010
+015400     05 QAR5-POA-FILLER1          PIC 99.                         01540010
+015500     05 QAR5-POA-FILLER2          PIC 99.                         01550010
+015600     05 QAR5-CLM-DGNS-CD-J-CNT    PIC 99.                         01560010
+015700     05 QAR5-CLM-DGNS-E-CD-CNT    PIC 99.                         01570010
+015800     05 QAR5-PRCDR-FILLER         PIC 99.                         01580010
+015900     05 QAR5-COND-COUNT           PIC 9(02).                      01590010
+016000     05 QAR5-OCCR-COUNT           PIC 9(02).                      01600010
+016100     05 QAR5-SPAN-COUNT           PIC 9(02).                      01610010
+016200     05 QAR5-VALU-COUNT           PIC 9(02).                      01620010
+016300     05 QAR5-RVNU-COUNT           PIC 9(02).                      01630010
+016400     05 FILLER-4                  PIC 9(02).                      01640010
+016500     05 FILLER-5                  PIC 9(02).                      01650010
+016600                                                                  01660010
+016700   03 QAR5-ERROR-CODES.                                           01670010
+016800       05 QAR5-ERROR-CODE         PIC X(04)                       01680010
+016900                         OCCURS 13 TIMES.                         01690010
+017000                                                                  01700010
+017100   03  QAR5-SPECIFIC.                                             01710010
+017200********************* NEW ********************************        01720010
+017300       05  QAR5-LUPA-IND             PIC X.                       01730010
+017400       05  QAR5-HHA-REFERRAL-CODE    PIC X.                       01740010
+017500********************* NEW ********************************        01750010
+017600       05  QAR5-TOTAL-VISITS         PIC S999  COMP-3.            01760010
+017700       05  QAR5-QUALIFIED-DATES.                                  01770010
+017800           07 QAR5-STAY-FROM-Q      PIC 9(8).                     01780010
+017900           07 QAR5-STAY-THRU-Q      PIC 9(8).                     01790010
+018000       05  QAR5-DISCH-DATE           PIC 9(8).                    01800010
+018100       05  QAR5-START-OF-CARE        PIC 9(8).                    01810010
+018200       05  QAR5-ATNDG-PHYSN-SPCLTY-CD PIC X(2).                   01820010
+018300       05  QAR5-OPRTG-PHYSN-SPCLTY-CD PIC X(2).                   01830010
+018400       05  QAR5-OTHR-PHYSN-SPCLTY-CD  PIC X(2).                   01840010
+018500***    05 FILLER                     PIC X(44).                   01850010
+018600       05 QAR5-RFRG-ID-GRP.                                       01860010
+018700         10 QAR5-RFRG-UPIN           PIC X(6).                    01870010
+018800         10 QAR5-RFRG-NPI            PIC X(10).                   01880010
+018900         10 QAR5-RFRG-SRNM           PIC X(6).                    01890010
+019000         10 QAR5-RFRG-GVN-NAME       PIC X.                       01900010
+019100         10 QAR5-RFRG-MDL-NAME       PIC X.                       01910010
+019200         10 QAR5-RFRG-SPCLTY-CD      PIC X(2).                    01920010
+019300       05 QAR5-SRVC-LOC-NPI-NUM      PIC X(10).                   01930011
+019300       05 QAR5-PPS-STD-VAL-PMT       PIC S9(9)V99 COMP-3.         01930011
+019300       05 FILLER-5                   PIC X(484).                  01930011
+019400**     05 FILLER-5                   PIC X(490).                  01940011
+019500**  05 FILLER-5                   PIC X(500).                     01950011
+019400                                                                  01940010
+019500   03  QAR5-ONLINE.                                               01950010
+019600       05  QAR5-ONLINE-MISC.                                      01960010
+019700           07  QAR5-CANCEL-ALERT-IND          PIC X(01).          01970010
+019800           07  QAR5-72-AUTO-NOTICE-IND        PIC X(01).          01980010
+019900           07  QAR5-CHARGES-SUB-DEDUCT        PIC S9(7)V99 COMP-3.01990010
+020000           07  QAR5-ONLINE-PROC-SITE          PIC X(01).          02000010
+020100           07  QAR5-PSYC-PRIME-IND            PIC X(01).          02010010
+020200           07  QAR5-ONLINE-ORIG-SITE          PIC X(01).          02020010
+020300           07  QAR5-CAB-DISP-CODE             PIC X(02).          02030010
+020400       05  QAR5-ONLN-TRAILER         OCCURS 2.                    02040010
+020500           07  QAR5-ONLN-YEAR                 PIC X(04).          02050010
+020600           07  QAR5-ONLN-VISITS               PIC S9(3)    COMP-3.02060010
+020700           07  QAR5-ONLN-PINTS                PIC S9(2)V9  COMP-3.02070010
+020800           07  QAR5-ONLN-MEDICAL-EXP          PIC S9(5)V99 COMP-3.02080010
+020900           07  QAR5-ONLN-PSYCHOL-EXP          PIC S9(5)V99 COMP-3.02090010
+021000           07  QAR5-ONLN-PSYCHOL-PAY          PIC S9(5)V99 COMP-3.02100010
+021100           07  QAR5-ONLN-PHYTHER-EXP          PIC S9(5)V99 COMP-3.02110010
+021200           07  QAR5-ONLN-PHYTHER-PAY          PIC S9(5)V99 COMP-3.02120010
+021300           07  QAR5-ONLN-OCCTHER-EXP          PIC S9(5)V99 COMP-3.02130010
+021400           07  QAR5-ONLN-OCCTHER-PAY          PIC S9(5)V99 COMP-3.02140010
+021500           07  QAR5-ONLN-HHBP-MSTR   OCCURS 2 TIMES.              02150010
+021600               09  QAR5-ONLN-HHBP-TRLR-CD        PIC XX.          02160010
+021700               09  QAR5-ONLN-HHBP-QUALFY-IND     PIC X.           02170010
+021800               09  QAR5-ONLN-HHBP-PARTA-REMAIN   PIC S999.        02180010
+021900               09  QAR5-ONLN-HHBP-EARLY-BILL-DT  PIC 9(8).        02190010
+022000               09  QAR5-ONLN-HHBP-LATEST-BILL-DT PIC 9(8).        02200010
+022100               09  QAR5-ONLN-HHBP-PARTB-APPLIED  PIC S9(4).       02210010
+022200           07  QAR5-ONLN-HHEH-MSTR   OCCURS 2 TIMES.              02220010
+022300               09  QAR5-ONLN-HHEH-START-DATE     PIC 9(8).        02230010
+022400               09  QAR5-ONLN-HHEH-END-DATE       PIC 9(8).        02240010
+022500               09  QAR5-ONLN-HHEH-CONT-NUM       PIC X(5).        02250010
+022600               09  QAR5-ONLN-HHEH-PROV-NUM       PIC X(6).        02260010
+022700               09  QAR5-ONLN-HHEH-FILLER-1       PIC X(7).        02270010
+022800               09  QAR5-ONLN-HHEH-NPI-FILLER     PIC X(10).       02280010
+022900               09  QAR5-ONLN-HHEH-CODES OCCURS 6 TIMES.           02290010
+023000                   11  QAR5-ONLN-HHEH-HRG-CODE   PIC X(5).        02300010
+023100                   11  QAR5-ONLN-HHEH-HRG-DATE   PIC 9(8).        02310010
+023200               09  QAR5-ONLN-HHEH-DOEBA          PIC 9(8).        02320010
+023300               09  QAR5-ONLN-HHEH-DOLBA          PIC 9(8).        02330010
+023400               09  QAR5-ONLN-HHEH-PRIN-DIAG-IND  PIC X(1).        02340010
+023500               09  QAR5-ONLN-HHEH-PRIN-DIAG      PIC X(7).        02350010
+023600               09  QAR5-ONLN-HHEH-2ND-DIAG-IND   PIC X(1).        02360010
+023700               09  QAR5-ONLN-HHEH-SECOND-DIAG    PIC X(7).        02370010
+023800               09  QAR5-ONLN-HHEH-LUPA-IND       PIC X.           02380010
+023900               09  QAR5-ONLN-HHEH-PAT-STAT       PIC XX.          02390010
+024000               09  QAR5-ONLN-HHEH-CANCEL-IND     PIC X.           02400010
+024100                                                                  02410010
+024200*****************************************************             02420010
+024300***   FOLLOWING ARE FIXED LENGTH TRAILERS OCCURRING *****         02430010
+024400***                 A VARIABLE NUMBER OF TIMES. *********         02440010
+024500*****************************************************             02450010
+024600                                                                  02460010
+024700   03 QAR5-NCH-EDIT-GRP OCCURS 0 TO 13                            02470010
+024800              DEPENDING ON QAR5-HCFA-EDIT-CD-CNT.                 02480010
+024900     05 QAR5-NCH-EDIT-TRLR-CD PIC X.                              02490010
+025000           88 EDIT-TRAILER              VALUE 'E'.                02500010
+025100     05 QAR5-NCH-EDIT-CD      PIC X(4).                           02510010
+025200                                                                  02520010
+025300*  03 QAR5-NCH-PATCH-GRP OCCURS 0 TO 30                           02530010
+025400*             DEPENDING ON QAR5-HCFA-PATCH-CD-CNT.                02540010
+025500*    05 QAR5-NCH-PATCH-TRLR-CD PIC X.                             02550010
+025600*      88 PATCH-TRAILER              VALUE 'P'.                   02560010
+025700*    05 QAR5-NCH-PATCH-CD      PIC X(2).                          02570010
+025800*    05 QAR5-NCH-PATCH-DATE-APPLIED PIC 9(8).                     02580010
+025900                                                                  02590010
+026000   03 QAR5-MCO-PRD-TRLR-GRP OCCURS 0 TO 2                         02600010
+026100         DEPENDING ON QAR5-MCO-PRD-TRLR-CNT.                      02610010
+026200     05 QAR5-MCO-TRLR-CD      PIC X.                              02620010
+026300       88 MCO-TRAILER                    VALUE 'M'.               02630010
+026400     05 QAR5-MCO-CONTRACT-NUM PIC X(05).                          02640010
+026500     05 QAR5-MCO-OPTN-CODE    PIC X.                              02650010
+026600     05 QAR5-MCO-EFFECT-DATE PIC 9(8).                            02660010
+026700     05 QAR5-MCO-TERM-DATE    PIC 9(8).                           02670010
+026800     05 QAR5-MCO-PAYERID-NUM PIC X(14).                           02680010
+026900                                                                  02690010
+027000***03 QAR5-CLM-PAYERID-TRLR-GRP OCCURS 0 TO 3                     02700010
+027100***           DEPENDING ON QAR5-CLM-PAYERID-TRLR-CNT.             02710010
+027200***  05 QAR5-PAYERID-TRLR-CD PIC X.                               02720010
+027300***        88 PAYERID-TRAILER            VALUE 'I'.               02730010
+027400***  05 QAR5-PAYERID-CD       PIC X.                              02740010
+027500***  05 QAR5-PAYERID-NUM      PIC X(14).                          02750010
+027600                                                                  02760010
+027700   03 QAR5-DEMO-ID-TRLR-GRP OCCURS 0 TO 5                         02770010
+027800                   DEPENDING ON QAR5-CLM-DEMO-ID-TRLR-CNT.        02780010
+027900     05 QAR5-DEMO-ID-TRLR-CD PIC X(01).                           02790010
+028000           88 DEMO-TRAILER                VALUE 'D'.              02800010
+028100     05 QAR5-DEMO-ID-NUM      PIC X(02).                          02810010
+028200     05 QAR5-DEMO-INFO-TXT.                                       02820010
+028300        10 QAR5-DEMO-INFO-TXT-1-7    PIC X(7).                    02830010
+028400        10 QAR5-DEMO-INFO-TXT-8-12   PIC X(5).                    02840010
+028500        10 QAR5-DEMO-INFO-TXT-13-15  PIC X(3).                    02850010
+028600                                                                  02860010
+028700***03 QAR5-DGNS-TRAILER OCCURS 0 TO 10                            02870010
+028800***              DEPENDING ON QAR5-DIAG-CODE-COUNT.               02880010
+028900***  05 QAR5-DGNS-TRLR-CD     PIC X(01).                          02890010
+029000***    88 DIAG-TRAILER                    VALUE 'Y'.              02900010
+029100***  05 QAR5-DGNS-CD.                                             02910010
+029200***     07 QAR5-DGNS-CD-5     PIC X(05).                          02920010
+029300***     07 FILLER             PIC X(01).                          02930010
+029400                                                                  02940010
+029500   03 QAR5-DGNS-GRP       OCCURS 0 TO 25                          02950010
+029600                 DEPENDING ON QAR5-CLM-DGNS-CD-J-CNT.             02960010
+029700     05 QAR5-DGNS-TRLR-IND-CD          PIC X.                     02970010
+029800       88 DGNS-TRLR-IND-CD                   VALUE 'Y'.           02980010
+029900     05 QAR5-DGNS-VRSN-CD              PIC X.                     02990010
+030000     05 QAR5-DGNS-CD                   PIC X(7).                  03000010
+030100                                                                  03010010
+030200   03 QAR5-DGNS-E-GRP       OCCURS 0 TO 12                        03020010
+030300                 DEPENDING ON QAR5-CLM-DGNS-E-CD-CNT.             03030010
+030400     05 QAR5-DGNS-E-TRLR-IND-CD          PIC X.                   03040010
+030500       88 DGNS-E-TRLR-IND-CD                   VALUE 'W'.         03050010
+030600     05 QAR5-DGNS-E-VRSN-CD              PIC X.                   03060010
+030700     05 QAR5-DGNS-E-CD                   PIC X(7).                03070010
+030800                                                                  03080010
+030900   03 QAR5-COND-TRAILER OCCURS 0 TO 30                            03090010
+031000                     DEPENDING ON QAR5-COND-COUNT.                03100010
+031100     05 QAR5-COND-TRLR-CD     PIC X(01).                          03110010
+031200           88 COND-TRAILER                VALUE 'C'.              03120010
+031300     05 QAR5-RLT-COND-CD      PIC X(02).                          03130010
+031400                                                                  03140010
+031500   03 QAR5-OCCUR-TRAILER OCCURS 0 TO 30                           03150010
+031600                     DEPENDING ON QAR5-OCCR-COUNT.                03160010
+031700     05 QAR5-OCCUR-TRLR-CD    PIC X(01).                          03170010
+031800           88 OCCUR-TRAILER               VALUE 'O'.              03180010
+031900     05 QAR5-RLT-OCRNC-CD     PIC X(02).                          03190010
+032000     05 QAR5-RLT-OCRNC-DT     PIC 9(8).                           03200010
+032100                                                                  03210010
+032200   03 QAR5-SPAN-TRAILER OCCURS 0 TO 10                            03220010
+032300                     DEPENDING ON QAR5-SPAN-COUNT.                03230010
+032400     05 QAR5-SPAN-TRLR-CD     PIC X(01).                          03240010
+032500           88 SPAN-TRAILER                VALUE 'S'.              03250010
+032600     05 QAR5-OCRNC-SPAN-CD    PIC X(02).                          03260010
+032700     05 QAR5-OCRNC-SPAN-FROM-DT PIC 9(8).                         03270010
+032800     05 QAR5-OCRNC-SPAN-THRU-DT PIC 9(8).                         03280010
+032900                                                                  03290010
+033000   03 QAR5-VAL-TRAILER OCCURS 0 TO 36                             03300010
+033100                     DEPENDING ON QAR5-VALU-COUNT.                03310010
+033200     05 QAR5-VAL-TRLR-CD      PIC X(01).                          03320010
+033300           88 VAL-TRAILER                 VALUE 'V'.              03330010
+033400     05 QAR5-CLM-VAL-CD       PIC X(02).                          03340010
+033500     05 QAR5-CLM-VAL-AMT      PIC S9(9)V99 COMP-3.                03350010
+033600                                                                  03360010
+033700   03 QAR5-RVNU-TRAILER      OCCURS 00 TO 45                      03370010
+033800         DEPENDING ON QAR5-RVNU-COUNT.                            03380010
+033900     05 QAR5-RVNU-TRAILER-CODE    PIC X(1).                       03390010
+034000           88 RNVU-TRAILER                VALUE 'R'.              03400010
+034100     05 QAR5-RVNU-CENTER.                                         03410010
+034200         07 FILLER                PIC X(1).                       03420010
+034300         07 QAR5-RVNU-CODE        PIC X(3).                       03430010
+034400     05 QAR5-RVNU-DATE            PIC 9(8).                       03440010
+034500     05 QAR5-RVNU-ANSI1           PIC X(5).                       03450010
+034600     05 QAR5-RVNU-ANSI2           PIC X(5).                       03460010
+034700     05 QAR5-RVNU-ANSI3           PIC X(5).                       03470010
+034800     05 QAR5-RVNU-ANSI4           PIC X(5).                       03480010
+034900     05 QAR5-RVNU-HIPPS-CODE      PIC X(5).                       03490010
+035000     05 QAR5-RVNU-HCPCS           PIC X(5).                       03500010
+035100     05 QAR5-RVNU-HCPCS-M1        PIC X(2).                       03510010
+035200     05 QAR5-RVNU-HCPCS-M2        PIC X(2).                       03520010
+035300     05 QAR5-RVNU-HCPCS-M3        PIC X(2).                       03530010
+035400     05 QAR5-RVNU-HCPCS-M4        PIC X(2).                       03540010
+035500     05 QAR5-RVNU-HCPCS-M5        PIC X(2).                       03550010
+035600     05 QAR5-RVNU-PMT-METHOD-IND  PIC X(2).                       03560010
+035700     05 QAR5-RVNU-DISCOUNT-FLAG   PIC X(1).                       03570010
+035800     05 QAR5-RVNU-PACKAGE-FLAG    PIC X(1).                       03580010
+035900     05 QAR5-RVNU-PRICING-IND     PIC X(2).                       03590010
+036000     05 QAR5-RVNU-OTAF-IND-CD     PIC X(1).                       03600010
+036100***  05 QAR5-RVNU-OTAF-1          PIC X(1).                       03610010
+036200***  05 QAR5-RVNU-OTAF-2          PIC X(1).                       03620010
+036300     05 QAR5-RVNU-IDE-NDC-UPC-NUM.                                03630010
+036400        10 QAR5-RVNU-IDE-NUM         PIC X(07).                   03640010
+036500        10 QAR5-RVNU-FILLER-1        PIC X(17).                   03650010
+036600     05 QAR5-RVNU-NDC-QTY-QLFR-CD    PIC XX.                      03660010
+036700     05 QAR5-RVNU-NDC-QTY            PIC S9(7)V999 COMP-3.        03670010
+036800     05 QAR5-RVNU-UNITS           PIC S9(7)    COMP-3.            03680010
+036900     05 QAR5-RVNU-RATE            PIC S9(9)V99 COMP-3.            03690010
+037000     05 QAR5-RVNU-BLOOD-DEDUCT    PIC S9(9)V99 COMP-3.            03700010
+037100     05 QAR5-RVNU-CASH-DEDUCT     PIC S9(9)V99 COMP-3.            03710010
+037200     05 QAR5-RVNU-WAGE-ADJ-COINS  PIC S9(9)V99 COMP-3.            03720010
+037300     05 QAR5-RVNU-REDUCE-COINS    PIC S9(9)V99 COMP-3.            03730010
+037400     05 QAR5-RVNU-MSP1-PAID-AMT   PIC S9(9)V99 COMP-3.            03740010
+037500     05 QAR5-RVNU-MSP2-PAID-AMT   PIC S9(9)V99 COMP-3.            03750010
+037600**** 05 QAR5-RVNU-PROFESS-COMP    PIC S9(9)V99 COMP-3.            03760010
+037700     05 QAR5-RVNU-PROVIDER-PMT    PIC S9(9)V99 COMP-3.            03770010
+037800     05 QAR5-RVNU-PATIENT-AMT     PIC S9(9)V99 COMP-3.            03780010
+037900     05 QAR5-RVNU-PATIENT-RESPON  PIC S9(9)V99 COMP-3.            03790010
+038000     05 QAR5-RVNU-PAYMENT-AMOUNT  PIC S9(9)V99 COMP-3.            03800010
+038100     05 QAR5-RVNU-TOTAL           PIC S9(9)V99 COMP-3.            03810010
+038200     05 QAR5-RVNU-NONCOV          PIC S9(9)V99 COMP-3.            03820010
+038300**** 05 QAR5-RVNU-OVERRIDE        PIC X(01). NAME CHANGE.         03830010
+038400****         RVNU-OVERRIDE = RVNU-DDCTBL-COINSRNC-CD.             03840010
+038500     05 QAR5-RVNU-DDCTBL-COINSRNC-CD   PIC X(01).                 03850010
+038600     05 QAR5-RVNU-CB-OV               PIC X(01).                  03860010
+038700     05 QAR5-RVNU-STATUS-IND          PIC XX.                     03870010
+038800     05 QAR5-RVNU-SUSP-DUP-REV-IND    PIC X(01).                  03880010
+038900     05 QAR5-RVNU-APC-BUFR-CD         PIC XX.                     03890010
+039000     05 QAR5-RVNU-RNDRNG-PHYSN-NPI-NUM       PIC X(10).           03900010
+039100     05 QAR5-RVNU-RNDRNG-SRNM-NAME           PIC X(6).            03910010
+039200     05 QAR5-RVNU-PWK-CD              PIC X(2).                   03920010
+039300     05 QAR5-RVNU-PHYSN-SPCLTY-CD     PIC X(2).                   03930010
+039400     05 QAR5-RVNU-THRPY-CAP-IND OCCURS 5 TIMES                    03940010
+039500                                      PIC X.                      03950010
+039600     05 QAR5-RVNU-FPS-MODEL-NUM       PIC X(2).                   03960010
+039700     05 QAR5-RVNU-FPS-RSN-CD          PIC X(3).                   03970010
+039800     05 QAR5-RVNU-FPS-RMRK-CD         PIC X(5).                   03980010
+039900     05 QAR5-RVNU-FPS-MSN-1-CD        PIC X(5).                   03990010
+040000     05 QAR5-RVNU-FPS-MSN-2-CD        PIC X(5).                   04000010
+040300     05 QAR5-RVNU-PTNT-ADD-ON-PMT     PIC S9(9)V99 COMP-3.        04030013
+040400     05 QAR5-RVNU-PRIOR-AUTH-IND      PIC X(4).                   04040013
+040500     05 QAR5-RVNU-UNIQ-TRKNG-NUM      PIC X(14).                  04050013
+041300     05 QAR5-RVNU-RP-IND              PIC X.                      04130014
+041300     05 QAR5-RVNU-TRNSTNL-DRUG-AMT    PIC S9(7)V9(4) COMP-3.      04130014
+041300     05 QAR5-RVNU-FILLER-2            PIC X(349).                 04130014
+041400***  05 QAR5-RVNU-FILLER-2            PIC X(355).                 04140014
+041500***  05 QAR5-RVNU-FILLER-2            PIC X(356).                 04150014
+040700***  05 QAR5-RVNU-FILLER-2            PIC X(380).                 04070013
+040300                                                                  04030010
+040400   03 QAR5-RECORD-END               PIC X(03).                    04040010
+040500*          88 END-OF-RECORD             VALUE 'EOR'.              04050010
+040600*          88 END-OF-CLAIM              VALUE 'EOC'.              04060010
+

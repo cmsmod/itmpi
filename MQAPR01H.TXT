@@ -1,0 +1,50 @@
+//B1D9HHA  JOB (BGIBGA5001T,B112),B1D9WCB,                              00010099
+//*   TYPRUN=SCAN,                                                      00020099
+//*   RESTART=PS040,                                                    00030199
+//    MSGCLASS=Q,                                                       00030299
+//    MSGLEVEL=(1,1),CLASS=D,NOTIFY=B1D9                                00030399
+//*                                                                     00030400
+/*ROUTE XEQ HCFJESM4                                                    00030599
+/*JOBPARM LINES=99,SYSAFF=S0HK                                          00030699
+/*OUTPUT  OUT1 LINECT=60                                                00030700
+//*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%                              00030800
+//*%%%% CHECK FOR CORRECT LOADLIB!!   %%%%                              00030900
+//*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%                              00031000
+//*                                                                     00031100
+//JOBLIB  DD DSN=JH00.AWS.LOADLIB,DISP=SHR                              00031299
+//        DD DSN=PROD.HCFA.LOADLIB,DISP=SHR                             00031499
+//        DD DSN=PROD.HCFA.COMMON.LOADLIB,DISP=SHR                      00031599
+//        DD DSN=SYS1.@CEE.SCEERUN,DISP=SHR                             00031600
+//*                                                                     00031900
+//PS001   EXEC PGM=IEFBR14                                              00032000
+//*RRFIL  DD DSN=B1D9.@BFA2704.ERRORS.EDIT.H100729,                     00032199
+//*          DISP=(OLD,DELETE)                                          00033099
+//ERRFIL1 DD DSN=B1D9.@BGI5001.DAILY.SEG1.H190729,                      00034099
+//           DISP=(OLD,DELETE)                                          00035099
+//SYSDUMP   DD SYSOUT=*                                                 00035700
+//SYSOUT    DD SYSOUT=*                                                 00035800
+//SYSUDUMP  DD SYSOUT=*                                                 00035900
+//*                                                                     00036000
+//*  NB: MQAP010T FORCES PARM DATE INTO LEADERS, RECORD                 00037099
+//*  NB: MQAP010B INPUT OSDM IS VB NOT VBS                              00037199
+//*                                                                     00037299
+//PS040  EXEC PGM=MQAPHHAB,                                             00038099
+//***40  EXEC PGM=MQAP010D,                                             00038199
+//       PARM='MQAHHAB,MQAPHHAB,PS040.S*=20190729-99999999',            00039099
+//       REGION=0M,COND=(4,LT,PS001)                                    00040000
+//MQAICLIN DD DSN=B1D9.#MQR.OSDM.HHAB.D190729.EDTD,                     00065099
+//            DISP=SHR                                                  00070000
+//MQAIHCPC DD DSN=P@QAC.@BFA2701.CONTROL.HCPCS.LOAD(+0),                00100099
+//            DISP=SHR                                                  00110000
+//MQAOCLS1 DD DSN=B1D9.@BGI5001.DAILY.SEG1.H190729,                     00180099
+//            DISP=(NEW,CATLG,DELETE),                                  00200000
+//            SPACE=(CYL,(1,1),RLSE),                                   00210099
+//            DCB=(RECFM=VB,LRECL=32100,BLKSIZE=0)                      00230000
+//SYSDUMP  DD SYSOUT=*                                                  00490000
+//SYSOUR   DD SYSOUT=*                                                  00500000
+//SYSOUT   DD SYSOUT=*                                                  00510000
+//SYSUDUMP DD SYSOUT=*                                                  00520000
+//SYSABEND DD SYSOUT=*                                                  00530000
+//                                                                      01761599
+//                                                                      01761699
+

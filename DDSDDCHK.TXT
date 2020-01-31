@@ -1,0 +1,125 @@
+******************************************************************      00000010
+*  FUNCTION: INDICATE WHETHER A DDNAME IS ALLOCATED.             *      00000020
+*  WRITTEN:         APR 1,  1986                                 *      00000030
+*  ASSEMBLE FOR HCFA  MARCH 26, 1998                             *      00000030
+*  AUTHOR:          JIM HARRISON - OIS/EDG/DDS                   *      00000040
+*  COPY, SIMPLIFY FOR CLOUD CONVERSION DEMO SEP 16, 2019 WCB     *      00000030
+*  INSTALLATION:    SSA/OSI/OSIE/DDA/DRMB                        *      00000050
+*  FOR MORE INFORMATION...: IBM OS/VS2 SPL:JOB MANAGEMENT        *      00000060
+******************************************************************      00000070
+*                      REGISTERS                                 *      00000080
+******************************************************************      00000090
+*        1=REQUEST BLOCK POINTER                                 *      00000100
+*        4=BASE REGISTER                                         *      00000110
+*        6=PARMS DSECT POINTER                                   *      00000120
+*       12=LINKAGE                                               *      00000130
+*       14=POINTER                                               *      00000140
+*       15=RETURN CODE/POINTER                                   *      00000150
+******************************************************************      00000160
+         PRINT NOGEN                                                    00000170
+DDSDDCHK START 0                                                        00000180
+DDSDDCHK AMODE 31                                                       00800000
+DDSDDCHK RMODE 24                                                       00810000
+         REGISTER                                                       00000190
+         SAVE  (14,12)                                                  00000120
+         LR    R4,R15                                                   00000130
+         USING DDSDDCHK,R4                                              00000140
+         LA    R5,SAVEAREA                                              00000150
+         ST    R5,8(R13)                                                00000160
+         ST    R13,SAVEAREA+4                                           00000170
+*
+         L     R6,R0(1)                                                 00000240
+         USING PARMS,R6                                                 00000250
+*                                                                       00000260
+         MVI   DYNSP1,X'00'            SET PARAMETER LIST TO LOW VALUES 00000270
+         MVC   DYNSP1+1,DYNSP1                                          00000280
+*********************************************************************** 00000290
+**   INITIALIZATION FOR ALLOCATION REQUEST                           ** 00000300
+*********************************************************************** 00000310
+         LA    R1,DYNSP1               LOAD ADDRESS OF PARAM LIST       00000320
+         USING DYN1DS,R1               USE GENERATED DSECT              00000330
+         LA    R15,DYN1RB              LOAD ADDRESS OF S99 RB           00000340
+         USING S99RB,R15                                                00000350
+         ST    R15,0(R1)               AND STORE IN RB POINTER          00000360
+         XC    4(DYN1LEN-4,R1),4(R1)   ZERO PARAMETER LIST              00000370
+         MVI   S99RBLN,20              MOVE IN LIST LENGTH(20)          00000380
+         MVI   S99VERB,S99VRBIN  ----->MOVE IN VERB CODE(07)            00000390
+         LA    R14,DYN1TUP             LOAD ADDRESS OF TU POINTERS      00000400
+         ST    R14,S99TXTPP            STORE ADDRESS IN S99 RB          00000410
+         LA    R15,DYN1TU              POINT TO SPACE FOR TEXT UNITS    00000420
+         USING S99TUNIT,R15                                             00000430
+*********************************************************************** 00000440
+**   DDNAME TEXT UNIT   X'0001'                                      ** 00000450
+*********************************************************************** 00000460
+         MVI   S99TUKEY+1,DINDDNAM     SET TEXT UNIT KEY                00000470
+         MVI   S99TUNUM+1,1            SET NUMBER FIELD                 00000480
+         MVI   S99TULNG+1,8            MOVE IN LENGTH OF DDNAME         00000490
+         MVC   S99TUPAR(8),DDNAME     MOVE IN DDNAME  NAME              00000500
+         ST    R15,DYN1TUP             STORE TEXT UNIT ADDRESS          00000510
+         LA    R15,14(R15)             BUMP TEXT UNIT PTR TO NEXT SLOT  00000520
+*********************************************************************** 00000530
+**    DSNAME RETRIEVE UNIT X'0005'                                   ** 00000540
+*********************************************************************** 00000550
+         MVI   S99TUKEY+1,DINRTDSN     SET TEXT UNIT KEY                00000560
+         MVI   S99TUNUM+1,1            SET NUMBER FIELD                 00000570
+         MVI   S99TULNG+1,X'2C'        MOVE IN LENGTH OF DSN            00000580
+         MVI   S99TUPAR,X'40'          CLEAR OUT DSNAME FIELD           00000590
+         MVC   S99TUPAR+1(43),S99TUPAR                                  00000600
+         LA    R10,S99TUPAR            SAVE ADDRESS OF DSNAME           00000610
+         ST    R15,DYN1TUP+4           STORE TEXT UNIT ADDRESS          00000620
+*********************************************************************** 00000630
+**   WRAP UP TEXT UNIT BUILDING ** TURN ON PERMANENT ATTRIBUTE       ** 00000640
+*********************************************************************** 00000650
+         MVI   DYN1TUP+4,X'80'        SET HIGH ORDER BIT ON TEXT PTRS   00000660
+         MVI   DYN1RBP,X'80'           SET HIGH ORDER BIT ON RB PTR     00000670
+         DROP  R1,R15                  DEACTIVATE ADDRESSABILITY        00000680
+         LA    R14,4(R1)               POINT TO REQUEST BLOCK           00000690
+         SVC   99                                                       00000700
+         USING DYN1RB,R14              SET UP ADDRESSABILITY            00000710
+*                                                                       00000720
+** R14 = RB ADDRESS                                                     00000730
+** R15 = RETURN CODE                                                    00000740
+*                                                                       00000750
+DYN1DS   DSECT    -- DSECT TO MAP SVC 99 DATA -- 256 BYTE MAX ---       00000760
+DYN1RBP   DS   F                       SVC 99 REQ BLOCK POINTER         00000770
+DYN1RB    DS   5F                      SVC 99 REQUEST BLOCK             00000780
+DYN1TUP   DS   CL70                    SPACE FOR TEXT POINTERS          00000790
+DYN1TU    DS   CL162                   SPACE FOR TEXT UNITS(DYNSP1)     00000800
+DYN1LEN   EQU  *-DYN1RBP               LENGTH OF SPACE USED             00000810
+*                                                                       00000820
+DDSDDCHK CSECT                                                          00000830
+         LR    8,14               GET ADDRESS OF REQUEST BLOCK          00000840
+         USING S99RB,8            -ESTABLISH ADDRESSABILITY             00000850
+         MVC   DSNAMEH(44),0(R10)        GET DATASET NAME               00000860
+         MVC   DSNAME(44),DSNAMEH        MOVE IT TO LINKGE              00000870
+         CLC   DSNAMEH(7),=C'NULLFILE'                                  00000880
+         BE    RC4                   IF NULLFILE, SET RETURN CODE = 4   00000890
+         CLI   DSNAMEH,C' '                                             00000900
+         BNE   EXIT                  IF NOT SPACES, EXIT                00000910
+         L     R15,=F'12'            ELSE SET RETURN-CODE = 12          00000920
+         B     EXIT                                                     00000930
+RC4      EQU   *                                                        00000940
+         L     R15,=F'4'                                                00000950
+EXIT     EQU   *                                                        00000960
+         L     R13,SAVEAREA+4                                           00003620
+         RETURN (14,12),,RC=(15)                                        00000970
+*                                                                       00000980
+         DS    0F                                                       00000990
+DYNSP1   DS    CL256      SVC PARAMETER STORAGE MAPPED BY DSECT         00001000
+*                          -THIS IS WHAT YOU WANT TO LOOK AT IN TEST -  00001010
+SAVEAREA DC    18F'0'                                                   00001020
+DSNAMEH  DS    CL44                                                     00001030
+*                                                                       00001040
+         PRINT GEN                                                      00001050
+* DSECT MACRO                                                           00001060
+         IEFZB4D0                                                       00001070
+*                                                                       00001080
+* MNEMONICS MACRO                                                       00001090
+         IEFZB4D2                                                       00001100
+*                                                                       00001110
+PARMS    DSECT                                                          00001120
+PARMLEN  DS    H                                                        00001130
+DDNAME   DS    CL8                                                      00001140
+DSNAME   DS    CL44        RETURNED TO PROGRAM                          00001150
+         END   DDSDDCHK                                                 00001160
+

@@ -1,0 +1,23 @@
+IBM ENTERPRISE COBOL FOR Z/OS  4.2.0 V3R3
+
+EDIT       JH00.AWS.COBOL(COMPAWS) - 01.46                 Columns 00001 00072 
+Command ===>                                                  Scroll ===> CSR  
+****** ***************************** Top of Data ******************************
+000100 //B1D9HHAB JOB (BGIBGA5001T,B112),B1D9NOBIND,CLASS=D,MSGCLASS=Q,        
+000200 //*  TYPRUN=SCAN,                                                       
+000300 //             MSGLEVEL=1,NOTIFY=B1D9                                   
+000700 /*JOBPARM  SYSAFF=S0HK                                                  
+000710 /*ROUTE XEQ HCFJESM4                                                    
+000800 //*                                                                     
+000900 //JS010   EXEC IGYWCL,                                                  
+001000 //             PARM.COBOL=(DYNAM,LIB,RENT,APOST,X,SSRANGE,OPT,XREF,AWO, 
+001100 //             RENT,TRUNC(OPT),NOLIST,OFF)                              
+001200 //COBOL.SYSLIB DD DSN=JH00.CR15.COPYLIB,DISP=SHR                        
+001300 //          DD DSN=PROD.COPY.LIB,DISP=SHR                               
+001400 //COBOL.SYSTERM DD SYSOUT=*                                             
+001500 //COBOL.SYSIN DD DSN=JH00.AWS.COBOL(MQAPHHAB),DISP=SHR                  
+001700 //LKED.SYSLMOD DD DSN=JH00.AWS.LOADLIB(MQAPHHAB),DISP=SHR               
+002000 //                                                                      
+
+
+NB: All copybooks were hard-coded into the program: none are copied in from a copy library.

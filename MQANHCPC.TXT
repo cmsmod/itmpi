@@ -1,0 +1,386 @@
+000100 PROCESS ADV,NOAWO,APOST,NODBCS,DU,DYN,NOFSRT,LIB                 00010074
+000200 PROCESS MAP,NONUM,NUMPROC(MIG),OUT(SYSOUR),NORENT                00020074
+000300 PROCESS NOSEQ,S,SSR,NOTERM,TRUNC(OPT),VBREF,NOWORD,XREF,NOZWB    00030074
+000400                                                                  00040074
+490100 IDENTIFICATION DIVISION.                                         49010000
+490200*PROGRAM-ID.    MQAMHCPC.                                         49020076
+490201* REV 00: 09 SEP 92  ORIGINAL PRODUCTION VERSION                  49020176
+490210 PROGRAM-ID.    MQANHCPC.                                         49021076
+490300 AUTHOR.        DDOM WILLIAM BRACK.                               49030076
+490400 DATE-COMPILED.                                                   49040000
+490500                                                                  49050000
+490510******************************************************************49051076
+490520*      ****RETURN HCPCS EDIT-TABLE RECORD****                     49052076
+490530*  USING LINKED-LIST CRUNCHDOWN OF CWF VSAM HCPC FILE VIA MQAXHCPC49053076
+490540*  PROGRAM WRITTEN BY ISTC. THE USE OF INTERNAL BINARY SEARCHES   49054076
+490550*  IS SEVERAL TIMES FASTER THAN A VSAM OR INDEXED FILE READ, AND  49055076
+490560*  REDUCES DAILY RUNTIME BY AROUND 2 HOURS, FOR A 6 MILLION CLAIM 49056076
+490570*  OSDM FILE.                                                     49057076
+490571*  ON FIRST CALL, THE LIST IS LOADED INTO WS. SUBSEQUENT CALLS    49057176
+490572*  RETURN THE ASSEMBLED DATA.  LIST IS 31,890 ELEMENTS (R2019300) 49057280
+490580******************************************************************49058076
+490600*REVISIONS:                                                       49060076
+491600* NEW 00: 23 AUG 19  DEMO MQANHCPC; SIMPLIFY MQAMHCPC             49160080
+491700                                                                  49170000
+491800*REMARKS.       PROGRAM TO RETURN HCPCS EDIT RECORD               49180000
+491900*                                                                 49190000
+492000*  INPUT:  REQUEST: HCPCS-CODE, HCPCS-DATE                        49200000
+492100* OUTPUT:  RELATED HCPCS-RECORD                                   49210000
+492200*                                                                 49220000
+492300* SOURCE:  SEQUENTIAL SUMMARY FILE OF UNIQUE:                     49230000
+492400*              HCPCS (CODE) RECORDS                               49240000
+492500*              RANGE (DATE) RECORDS                               49250000
+492600*              GROUP (MISC) RECORDS                               49260000
+492700*              PARAM (INFO) RECORDS                               49270000
+492800*                                                                 49280000
+492900*   NOTE:  THIS FILE IS CREATED BY PROGRAM MQAXHCPC.              49290000
+493000*                                                                 49300000
+493100*  ABORT:  MODULE WILL FAIL IF TABLES OVERFLOW.                   49310000
+493200 TITLE 'MQANHCPC: FILE CONTROL'                                   49320000
+493300 ENVIRONMENT DIVISION.                                            49330000
+493400*CONFIGURATION SECTION.                                           49340000
+493500 INPUT-OUTPUT SECTION.                                            49350000
+493600 FILE-CONTROL.                                                    49360000
+493700     SELECT HCPCS-FILE           ASSIGN TO UT-S-MQAIHCPC          49370000
+493800         ORGANIZATION SEQUENTIAL FILE STATUS    HCPC-STATUS.      49380000
+493900                                                                  49390000
+494000 DATA DIVISION.                                                   49400000
+494100 FILE SECTION.                                                    49410000
+494200 FD  HCPCS-FILE                                                   49420000
+494300     BLOCK  CONTAINS   0 RECORDS                                  49430000
+494400     RECORD CONTAINS  16 TO 91 CHARACTERS                         49440000
+494500     RECORDING MODE IS V                                          49450000
+494600     LABEL  RECORDS  ARE STANDARD.                                49460000
+494700 01  HCPCS-INPUT.                                                 49470000
+494800     03  HCPCS-RECODE                   PIC X(01).                49480000
+494900         88  HCPCS-CODE-IDEN                VALUE 'C'.            49490000
+495000         88  HCPCS-DATE-IDEN                VALUE 'D'.            49500000
+495100         88  HCPCS-INFO-IDEN                VALUE 'I'.            49510000
+495200         88  HCPCS-MISC-IDEN                VALUE 'M'.            49520000
+495300     03  FILLER                         PIC X(90).                49530000
+495400 01  HCPCS-CODE-RECORD.                                           49540000
+495500     03  HCPCS-CODE-RECODE              PIC X(01).                49550000
+495600     03  HCPCS-CODE-ENTRY               PIC X(15).                49560000
+495700 01  HCPCS-DATE-RECORD.                                           49570000
+495800     03  HCPCS-DATE-RECODE              PIC X(01).                49580000
+495900     03  HCPCS-DATE-ENTRY.                                        49590000
+496000         05  HCPCS-DATE-FROM            PIC 9(08).                49600000
+496100         05  HCPCS-DATE-THRU            PIC 9(08).                49610000
+496200         05  HCPCS-DATE-INFO            PIC S9(4)    COMP.        49620000
+496300 01  HCPCS-INFO-RECORD.                                           49630000
+496400     03  HCPCS-INFO-RECODE              PIC X(01).                49640000
+496500     03  HCPCS-INFO-ENTRY               PIC X(90).                49650000
+496600 01  HCPCS-MISC-RECORD.                                           49660000
+496700     03  HCPCS-MISC-RECODE              PIC X(01).                49670000
+496800     03  HCPCS-MISC-ENTRY               PIC X(19).                49680000
+496900 TITLE 'MQANHCPC: WORKING STORAGE'                                49690000
+497000 WORKING-STORAGE SECTION.                                         49700000
+497100 77  RELEASED PIC X(32) VALUE '>> MQANHCPC 01/03/17 14:00 PM <<'. 49710000
+497200                                                                  49720000
+497300 01  FLAGS-AND-COUNTERS.                                          49730000
+497400     03  INDICIES.                                                49740000
+497500         05  C1                PIC S9(8)    VALUE ZERO COMP.      49750000
+497600         05  C1MAX             PIC S9(8)    VALUE ZERO COMP.      49760000
+497700         05  C2                PIC S9(4)    VALUE ZERO COMP.      49770000
+497800         05  DX                PIC S9(4)    VALUE ZERO COMP.      49780000
+497900         05  IX                PIC S9(4)    VALUE ZERO COMP.      49790000
+498000         05  MX                PIC S9(4)    VALUE ZERO COMP.      49800000
+498100         05  INCRA             PIC S9(8)    VALUE ZERO COMP.      49810000
+498200     03  ABORT-CODE            PIC X(02)    VALUE SPACES.         49820000
+498300         88  ABORT-JOB                      VALUE '09'.           49830000
+498400         88  ABORT-DUMP                     VALUE '10'.           49840000
+498500     03  HCPC-STATUS           PIC X(02)    VALUE '**'.           49850000
+498600         88  HCPC-FIRST-TIME                VALUE '**'.           49860000
+498700     03  HOLD-FORMAT           PIC X(96)    VALUE SPACES.         49870000
+498800     03  MQANHCPC-OCCURS.                                         49880000
+498900         05  CODE-MAX          PIC S9(8)    VALUE 32768 COMP.     49890000
+499000         05  MISC-MAX          PIC S9(8)    VALUE   256 COMP.     49900000
+499200         05  DATE-MAX          PIC S9(8)    VALUE  6144 COMP.     49920000
+499300         05  INFO-MAX          PIC S9(8)    VALUE  3072 COMP.     49930000
+499400     03  TEST-RESULT           PIC X(01)    VALUE 'X'.            49940000
+499500         88  TEST-ACTIVE                    VALUE 'A'.            49950000
+499600         88  TEST-INACTIVE                  VALUE 'I'.            49960000
+499700         88  TEST-INVALID                   VALUE 'X'.            49970000
+499800         88  TEST-VALID                     VALUE 'V'.            49980000
+499900         88  TEST-UNKNOWN                   VALUE '?'.            49990000
+500000                                                                  50000000
+500100*    NOTE: CODE-DATE, DATE-INFO POINTERS, NOT DATES.  IF          50010000
+500200*    NOTE: DATE-TABLE EXPANDS PAST 9999, EXPAND POINTER SIZE      50020000
+500300*    NOTE: HERE AND IN MQAXHCPC.                                  50030000
+500400 01  CODE-TABLE-C1.                                               50040000
+500500     03  CODE-ENTRY                         OCCURS 32768.         50050000
+500600         05  CODE-KEY          PIC X(05).                         50060000
+500700         05  CODE-MISC         PIC S9(4)                COMP.     50070000
+500800         05  CODE-DATE         PIC S9(4)    OCCURS 4    COMP.     50080000
+500900 01  MISC-TABLE-MX.                                               50090000
+501000     03  MISC-ENTRY                         OCCURS 00256.         50100000
+501100         05  MISC-XREF         PIC X(13).                         50110000
+501200         05  MISC-GROUP        PIC X(06).                         50120000
+501300 01  DATE-TABLE-DX.                                               50130000
+501400*    03  DATE-ENTRY                         OCCURS 05120.         50140000
+501500     03  DATE-ENTRY                         OCCURS 06144.         50150000
+501600         05  DATE-FROM         PIC 9(8).                          50160000
+501700         05  DATE-THRU         PIC 9(8).                          50170000
+501800         05  DATE-INFO         PIC S9(4)     COMP.                50180000
+501900 01  INFO-TABLE-IX.                                               50190000
+502000     03  INFO-ENTRY            PIC X(90)    OCCURS 03072.         50200000
+502100 TITLE 'MQANHCPC: ERR-MESSAGE'.                                   50210000
+502200 01  ERRMH-MESSAGE.                                               50220000
+502300*****COPY  MQARERRM REPLACING ==ERRM-== BY ==ERRMH-==.            50230076
+502301**   MQAMERRM IS AN AUTOMATED ERROR PRINT UTILITY WITH LOGIC TO   50230176
+502302**   ABEND RUN BY CALLING SSATERM, WITH SPECIFIC MESSAGES KEYED   50230276
+502303**   TO JOBNAME, PROCNAME, JOBSTEP, AND PARMS WHEN CALLED.        50230376
+502304**   FOR DEMO, SIMPLIFY ERROR-DESC, USE ONLY DISPLAYS.            50230476
+502310*    05  ERRMH-ERROR-IDEN                VALUE SPACES.            50231076
+502320*        10  ERRMH-JOBNAME     PIC X(07).                         50232076
+502330*        10  FILLER            PIC X(01).                         50233076
+502340*        10  ERRMH-PROCNAME    PIC X(08).                         50234076
+502350*        10  FILLER            PIC X(01).                         50235076
+502360*        10  ERRMH-PROCSTEP    PIC X(05).                         50236076
+502370*        10  FILLER            PIC X(01).                         50237076
+502380*        10  ERRMH-SEGMENT     PIC X(02).                         50238076
+502390*    05  ERRMH-PROGRAM         PIC X(08) VALUE 'PROGNAME'.        50239076
+502391*    05  ERRMH-FILLER1 REDEFINES ERRMH-PROGRAM.                   50239176
+502392*        10  ERRMH-FILLER      PIC X(07).                         50239276
+502393*        10  ERRMH-PASS-TYPE   PIC X.                             50239376
+502394*    05  ERRMH-FILE-DATE       PIC 9(08) VALUE ZEROES.            50239476
+502395     05  ERRMH-ERROR-DESC                VALUE SPACES.            50239500
+502396         10  ERRMH-ERROR       PIC X(02).                         50239600
+502397         10  FILLER            PIC X.                             50239776
+502398         10  ERRMH-DDNAME      PIC X(08).                         50239800
+502399         10  FILLER            PIC X.                             50239976
+502400         10  ERRMH-STATUS      PIC X(02).                         50240000
+502401         10  FILLER            PIC X.                             50240176
+502402         10  ERRMH-COMMENT     PIC X(60).                         50240200
+502403                                                                  50240376
+502405******************************************************************50240500
+502410 01  ERRMSG-OVERFLOW  VALUE 'XXXX OVERFLOW: ZZZZZ/ZZZZZ CTR/MAX'. 50241000
+502500     03  ERRMSG-ERROR-IDEN  PIC X(04).                            50250000
+502600     03  FILLER             PIC X(11).                            50260000
+502700     03  ERRMSG-CTR        PIC Z(05).                             50270000
+502800     03  FILLER             PIC X(01).                            50280000
+502900     03  ERRMSG-MAX         PIC Z(05).                            50290000
+503000     03  FILLER             PIC X(08).                            50300000
+503010                                                                  50301076
+503100 TITLE 'MQANHCPC: LINKAGE-SECTION'.                               50310000
+503200 LINKAGE SECTION.                                                 50320000
+503300 01  PASS-REQUEST.                                                50330000
+503400     03  PASS-CODE       PIC X(05).                               50340000
+503500     03  PASS-DATE       PIC 9(8).                                50350000
+503600     03  PASS-RETURN     PIC X(01).                               50360000
+503700         88  CODE-ACTIVE     VALUE 'A'.                           50370000
+503800         88  CODE-INACTIVE   VALUE 'I'.                           50380000
+503900         88  CODE-INVALID    VALUE 'X'.                           50390000
+504000                                                                  50400000
+504100 01  HCPCS-RECORD.                                                50410000
+504200**   COPY  MQARHCPC.                                              50420000
+504300     03  HCPC-KEY                             PIC X(05).          50430000
+504400*******  DATES OF PIC 9(08) ARE CCYYMMDD.                         50440000
+504500     03  HCPC-LAST-MAINT-DT                   PIC 9(08).          50450000
+504600     03  HCPC-LAST-MAINT-ID                   PIC X(08).          50460000
+504700*******  HCPC-TAPE-MAINT-DT IS CCYYMM.                            50470000
+504800     03  HCPC-TAPE-MAINT-DT                   PIC 9(06).          50480000
+504900     03  HCPC-TAPE-MAINT-CD                   PIC X(01).          50490000
+505000     03  HCPC-XREF.                                               50500000
+505100         05  HCPC-NEW-HCPC-CD                 PIC X(05).          50510000
+505200         05  HCPC-NEW-HCPC-EFF-DT             PIC 9(08).          50520000
+505300     03  HCPC-PROCEDURE-DESC                  PIC X(80).          50530000
+505400     03  HCPC-GROUP.                                              50540000
+505500         05  HCPC-MNEMONIC                    PIC X(05).          50550000
+505600         05  HCPC-INDV-REVIEW-IND             PIC X(01).          50560000
+505700             88  MEDICAID-SUSPEND                 VALUE 'R' 'U'.  50570000
+505800             88  MEDICARE-SUSPEND                 VALUE 'S' 'U'.  50580000
+505900     03  HCPC-TRLR-COUNT                      PIC S9(4) COMP.     50590000
+506000     03  HCPC-LAST-MAINT-CR                   PIC S9(5) COMP-3.   50600000
+506100     03  HCPC-BETOS                           PIC X(03).          50610000
+506200     03  HCPC-TRAILER OCCURS 0 TO 4 DEPENDING ON HCPC-TRLR-COUNT. 50620000
+506300      04 HCPC-DATE-RANGE.                                         50630000
+506400         05  HCPC-EFFECTIVE                   PIC 9(08).          50640000
+506500         05  HCPC-TERMINATE                   PIC 9(08).          50650000
+506600      04 HCPC-INFO-PARAM.                                         50660000
+506700         05  HCPC-COVERAGE                    PIC X(01).          50670000
+506800         05  HCPC-LAB-CLASSES.                                    50680000
+506900             07  HCPC-LAB-CLASS   OCCURS 8 PIC 9(03)    COMP-3.   50690000
+507000         05  HCPC-RELATIVE-VALUE              PIC 9(05)    COMP-3.50700000
+507100         05  HCPC-SURG-ASSISTANT              PIC X(01).          50710000
+507200         05  HCPC-FOLLOWUP                    PIC 9(03).          50720000
+507300         05  HCPC-MODIFIER-EDIT               PIC X(01).          50730000
+507400         05  HCPC-MODIFIER-CODES.                                 50740000
+507500             07  HCPC-MODIFIER-CODE OCCURS 6 PIC X(02).           50750000
+507600         05  HCPC-SERVICE-PLACE-EDIT          PIC X(01).          50760000
+507700         05  HCPC-SERVICE-PLACE-CODES.                            50770000
+507800             07  HCPC-SERVICE-PLACE-CODE                          50780000
+507900                                      OCCURS 6 PIC X(02).         50790000
+508000         05  HCPC-SERVICE-TYPE-EDIT           PIC X(01).          50800000
+508100         05  HCPC-SERVICE-TYPE-CODES.                             50810000
+508200             07  HCPC-SERVICE-TYPE-CODE OCCURS 6 PIC X(01).       50820000
+508300         05  HCPC-SPECIALTY-EDIT              PIC X(01).          50830000
+508400         05  HCPC-SPECIALTY-CODES.                                50840000
+508500             07  HCPC-SPECIALTY-CODE     OCCURS 6 PIC X(02).      50850000
+508600         05  HCPC-CATEGORY-CODES.                                 50860000
+508700             07  HCPC-CATEGORY-CODE OCCURS 7 PIC 9(03) COMP-3.    50870000
+508800         05  HCPC-FILLER-2                    PIC X(05).          50880000
+508900         05  HCPC-UPIN-REQD-DME               PIC X(01).          50890000
+509000***************************************************************** 50900000
+509600***************************************************************** 50960000
+509700 TITLE 'MQANHCPC: PROCEDURE DIVISION'.                            50970000
+509800 PROCEDURE DIVISION USING PASS-REQUEST, HCPCS-RECORD.             50980000
+509900                                                                  50990000
+510000     IF HCPC-FIRST-TIME                                           51000000
+510100         PERFORM LOAD-HCPCS-TABLES                                51010000
+510200         MOVE +1     TO HCPC-TRLR-COUNT                           51020000
+510300         MOVE SPACES TO HCPC-TRAILER (1)                          51030000
+510400         INITIALIZE     HCPC-TRAILER (1)                          51040000
+510500             REPLACING NUMERIC DATA BY ZEROES                     51050000
+510600         MOVE 'N' TO HCPC-UPIN-REQD-DME (1)                       51060000
+510700         MOVE HCPC-TRAILER (1) TO HOLD-FORMAT.                    51070000
+510800*START-OF-MODULE.                                                 51080000
+510900     IF PASS-CODE = CODE-KEY (C1)                                 51090000
+511000          SET TEST-VALID TO TRUE                                  51100000
+511100     ELSE PERFORM FIND-HCPCS-CODE.                                51110000
+511200     IF TEST-VALID                                                51120000
+511300         MOVE CODE-MISC (C1) TO MX                                51130000
+511400         PERFORM VARYING C2 FROM 1 BY 1 UNTIL NOT TEST-VALID      51140000
+511500             MOVE CODE-DATE (C1 C2) TO DX                         51150000
+511600             EVALUATE TRUE                                        51160000
+511700                 WHEN DX = ZERO OR C2 > 4                         51170000
+511800                      SET  TEST-INACTIVE  TO TRUE                 51180000
+511900                 WHEN PASS-DATE NOT < DATE-FROM (DX)              51190000
+512000                  AND PASS-DATE NOT > DATE-THRU (DX)              51200000
+512100                      SET  TEST-ACTIVE    TO TRUE                 51210000
+512200                      MOVE DATE-INFO (DX) TO IX                   51220000
+512300                 END-EVALUATE                                     51230000
+512400             END-PERFORM.                                         51240000
+512500     MOVE TEST-RESULT         TO PASS-RETURN.                     51250000
+512600     MOVE +01                 TO HCPC-TRLR-COUNT.                 51260000
+512700     MOVE HOLD-FORMAT         TO HCPC-TRAILER (1).                51270000
+512800     IF NOT CODE-INVALID                                          51280000
+512900         MOVE PASS-CODE       TO HCPC-KEY                         51290000
+513000         MOVE MISC-XREF  (MX) TO HCPC-XREF                        51300000
+513100         MOVE MISC-GROUP (MX) TO HCPC-GROUP.                      51310000
+513200     IF CODE-ACTIVE                                               51320000
+513300         MOVE +01             TO HCPC-TRLR-COUNT                  51330000
+513400         MOVE DATE-FROM  (DX) TO HCPC-EFFECTIVE  (1)              51340000
+513500         MOVE DATE-THRU  (DX) TO HCPC-TERMINATE  (1)              51350000
+513600         MOVE INFO-ENTRY (IX) TO HCPC-INFO-PARAM (1).             51360000
+513700*END-OF-MODULE.                                                   51370000
+513800     GOBACK.                                                      51380000
+513900 TITLE 'MQANHCPC: FIND-HCPCS-CODE'.                               51390000
+514000 FIND-HCPCS-CODE.                                                 51400000
+514100     IF PASS-CODE < CODE-KEY (C1)                                 51410000
+514200          MOVE +001  TO C1    ELSE                                51420000
+514300     IF C1 < C1MAX                                                51430000
+514400          ADD  +001  TO C1.                                       51440000
+514500     COMPUTE  INCRA = C1MAX - C1.                                 51450000
+514600     IF INCRA > 127                                               51460000
+514700          EVALUATE TRUE                                           51470000
+514800              WHEN INCRA > 16383     MOVE 16384 TO INCRA          51480000
+514900              WHEN INCRA > 08191     MOVE 08192 TO INCRA          51490000
+515000              WHEN INCRA > 04095     MOVE 04096 TO INCRA          51500000
+515100              WHEN INCRA > 02047     MOVE 02048 TO INCRA          51510000
+515200              WHEN INCRA > 01023     MOVE 01024 TO INCRA          51520000
+515300              WHEN INCRA > 00511     MOVE 00512 TO INCRA          51530000
+515400              WHEN INCRA > 00255     MOVE 00256 TO INCRA          51540000
+515500              WHEN OTHER             MOVE 00128 TO INCRA          51550000
+515600              END-EVALUATE                                        51560000
+515700     ELSE EVALUATE TRUE                                           51570000
+515800              WHEN INCRA > 00063     MOVE 00064 TO INCRA          51580000
+515900              WHEN INCRA > 00031     MOVE 00032 TO INCRA          51590000
+516000              WHEN INCRA > 00015     MOVE 00016 TO INCRA          51600000
+516100              WHEN INCRA > 00007     MOVE 00008 TO INCRA          51610000
+516200              WHEN INCRA > 00003     MOVE 00004 TO INCRA          51620000
+516300              WHEN INCRA > 00001     MOVE 00002 TO INCRA          51630000
+516400              WHEN OTHER             MOVE 00001 TO INCRA          51640000
+516500              END-EVALUATE.                                       51650000
+516600     SET TEST-UNKNOWN TO TRUE.                                    51660000
+516700     PERFORM UNTIL NOT TEST-UNKNOWN                               51670000
+516800         ADD INCRA TO C1                                          51680000
+516900         EVALUATE TRUE                                            51690000
+517000             WHEN C1 > C1MAX OR CODE-KEY (C1) > PASS-CODE         51700000
+517100                  SUBTRACT INCRA FROM C1                          51710000
+517200              WHEN CODE-KEY (C1) = PASS-CODE                      51720000
+517300                   SET TEST-VALID TO TRUE                         51730000
+517400              END-EVALUATE                                        51740000
+517500         COMPUTE INCRA = .5 * INCRA                               51750000
+517600         IF INCRA = ZERO                                          51760000
+517700              IF C1 > C1MAX                                       51770000
+517800                   MOVE +001 TO C1                                51780000
+517900                   END-IF                                         51790000
+518000              IF CODE-KEY (C1) = PASS-CODE                        51800000
+518100                   SET TEST-VALID   TO TRUE                       51810000
+518200              ELSE SET TEST-INVALID TO TRUE                       51820000
+518300                   END-IF                                         51830000
+518400              END-IF                                              51840000
+518500         END-PERFORM.                                             51850000
+518600 TITLE 'MQANHCPC: LOAD-HCPCS-TABLES'.                             51860000
+518700 LOAD-HCPCS-TABLES.                                               51870000
+518800     OPEN INPUT HCPCS-FILE.                                       51880000
+518900     IF HCPC-STATUS NOT = ZERO                                    51890000
+519000         MOVE '02' TO ERRMH-ERROR                                 51900000
+519100         PERFORM CALL-MQAMERRMH-HCPC.                             51910000
+519200     PERFORM UNTIL HCPC-STATUS NOT = ZERO                         51920000
+519300         READ HCPCS-FILE                                          51930000
+519400         IF HCPC-STATUS EQUAL ZERO                                51940000
+519500             EVALUATE TRUE                                        51950000
+519600             WHEN HCPCS-CODE-IDEN   PERFORM LOAD-HCPCS-CODE       51960000
+519700             WHEN HCPCS-DATE-IDEN   PERFORM LOAD-HCPCS-DATE       51970000
+519800             WHEN HCPCS-INFO-IDEN   PERFORM LOAD-HCPCS-INFO       51980000
+519900             WHEN HCPCS-MISC-IDEN   PERFORM LOAD-HCPCS-MISC       51990000
+520000             END-EVALUATE                                         52000000
+520100             END-IF                                               52010000
+520200         END-PERFORM.                                             52020000
+520300     CLOSE HCPCS-FILE.                                            52030000
+520400     MOVE C1 TO C1MAX, MOVE 01 TO C1.                             52040000
+520500 LOAD-HCPCS-CODE.                                                 52050000
+520600     ADD +00001 TO C1.                                            52060000
+520700     IF C1 NOT > CODE-MAX                                         52070000
+520800          MOVE HCPCS-CODE-ENTRY TO CODE-ENTRY (C1)                52080000
+520900     ELSE MOVE 'CODE'           TO ERRMSG-ERROR-IDEN              52090000
+521000          MOVE C1               TO ERRMSG-CTR                     52100000
+521100          MOVE CODE-MAX         TO ERRMSG-MAX                     52110000
+521200          PERFORM CALL-MQAMERRMSG-OFLOW.                          52120000
+521300 LOAD-HCPCS-DATE.                                                 52130000
+521400     ADD +00001 TO DX.                                            52140000
+521500     IF DX NOT > DATE-MAX                                         52150000
+521600          MOVE HCPCS-DATE-FROM  TO DATE-FROM  (DX)                52160000
+521700          MOVE HCPCS-DATE-THRU  TO DATE-THRU  (DX)                52170000
+521800          MOVE HCPCS-DATE-INFO  TO DATE-INFO  (DX)                52180000
+521900     ELSE MOVE 'DATE'           TO ERRMSG-ERROR-IDEN              52190000
+522000          MOVE DX               TO ERRMSG-CTR                     52200000
+522100          MOVE DATE-MAX         TO ERRMSG-MAX                     52210000
+522200          PERFORM CALL-MQAMERRMSG-OFLOW.                          52220000
+522300 LOAD-HCPCS-INFO.                                                 52230000
+522400     ADD +00001 TO IX.                                            52240000
+522500     IF IX NOT > INFO-MAX                                         52250000
+522600          MOVE HCPCS-INFO-ENTRY TO INFO-ENTRY (IX)                52260000
+522700     ELSE MOVE 'INFO'           TO ERRMSG-ERROR-IDEN              52270000
+522800          MOVE IX               TO ERRMSG-CTR                     52280000
+522900          MOVE INFO-MAX         TO ERRMSG-MAX                     52290000
+523000          PERFORM CALL-MQAMERRMSG-OFLOW.                          52300000
+523100 LOAD-HCPCS-MISC.                                                 52310000
+523200     ADD +00001 TO MX.                                            52320000
+523300     IF MX NOT > MISC-MAX                                         52330000
+523400          MOVE HCPCS-MISC-ENTRY TO MISC-ENTRY (MX)                52340000
+523500     ELSE MOVE 'MISC'           TO ERRMSG-ERROR-IDEN              52350000
+523600          MOVE MX               TO ERRMSG-CTR                     52360000
+523700          MOVE MISC-MAX         TO ERRMSG-MAX                     52370000
+523800          PERFORM CALL-MQAMERRMSG-OFLOW.                          52380000
+523900 TITLE 'MQANHCPC: SUBROUTINES'.                                   52390000
+524000 CALL-MQAMERRMH.                                                  52400000
+524110     DISPLAY 'MQANHCPC'.                                          52411076
+524111     DISPLAY 'ER DDNAME   ST   COMMENT'                           52411176
+524120     DISPLAY ERRMH-ERROR-DESC.                                    52412075
+524130     IF ERRMH-ERROR > '  '                                        52413078
+524140        STOP RUN                                                  52414075
+524150     END-IF.                                                      52415076
+524500 CALL-MQAMERRMH-HCPC.                                             52450000
+524600     MOVE 'MQAIHCPC'    TO ERRMH-DDNAME.                          52460000
+524700     MOVE HCPC-STATUS   TO ERRMH-STATUS.                          52470000
+524710     MOVE 'ERROR ON FILE OPEN: ABEND' TO ERRMH-COMMENT.           52471076
+524800     PERFORM CALL-MQAMERRMH.                                      52480000
+524900 CALL-MQAMERRMSG-OFLOW.                                           52490000
+525000     MOVE '09'          TO ERRMH-ERROR.                           52500075
+525100     MOVE ERRMSG-OVERFLOW TO ERRMH-COMMENT.                       52510000
+525200     PERFORM CALL-MQAMERRMH.                                      52520000
+525400                                                                  52540000
+
